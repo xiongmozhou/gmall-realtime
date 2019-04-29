@@ -12,6 +12,7 @@
         <module>dw-common</module>
         <module>dw-mock</module>
         <module>dw-logger</module>
+        <module>dw-realtime</module>
     </modules>
 
 

@@ -2,7 +2,7 @@ package com.atguigu.gmall1111.logger.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.atguigu.gmall1111.common.constant.GmallConstant;
+import com.atguigu.gmall.dw.realtime.constant.GmallConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
