@@ -13,6 +13,7 @@
         <module>dw-mock</module>
         <module>dw-logger</module>
         <module>dw-realtime</module>
+        <module>dw-cancl</module>
     </modules>
 
 

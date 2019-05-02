@@ -44,7 +44,6 @@ object DauApp {
 
         //第一次去重，如果已经在redis里面存在了，就不需要进行下面操作，减小IO
         val filterStartUpDS: DStream[StartUpLog] = startUpDS.transform(rdd => {
-            println("过滤前：" + rdd.count())
             //使用广播变量来决解序列化问题，然后把数据发送给exerutor。
             val client: Jedis = RedisUtil.getJedisClient
             val key = "dau:" + new SimpleDateFormat("yyyy-MM-dd").format(new Date())
@@ -53,36 +52,33 @@ object DauApp {
             val filterRDD: RDD[StartUpLog] = rdd.filter(x => {
                 !setDataRedis.value.contains(x.mid)
             })
-            println("过滤一后：" + filterRDD.count())
             filterRDD
         })
 
         //防止第一个批次出现多个有重复的数据，因为我们后面要往es里面存，所有先做去重处理。
-//        val groupByMid: DStream[(String, Iterable[StartUpLog])] = filterStartUpDS.map(x=>(x.mid,x)).groupByKey()
-        val groupByMid: DStream[(String, Iterable[StartUpLog])] = filterStartUpDS.map {
-            case start => {
-//                println("==========")
-                (start.mid, start)
-            }
-        }.groupByKey()
-        val flatMapDS: DStream[StartUpLog] = groupByMid.flatMap(x=>x._2)
+        val groupByMid: DStream[(String, Iterable[StartUpLog])] = filterStartUpDS.map(x=>(x.mid,x)).groupByKey()
+        val flatMapDS: DStream[StartUpLog] = groupByMid.flatMap {
+            case (mid, startuplogItr) =>
+            startuplogItr.take(1)
+        }
 
 
         //我们把数据存储到redis里面去
         flatMapDS.foreachRDD(rdd=>{
             //这里是在driver执行,因为startUpDS不是rdd
             rdd.foreachPartition(iter=>{
+                val client: Jedis = RedisUtil.getJedisClient
                 //这里是在exerutor执行
                 val startupLogList: List[StartUpLog] = iter.toList
-                val client: Jedis = RedisUtil.getJedisClient
                 for (elem <- startupLogList) {
                     //先获取当前时间
                     val key = "dau:"+elem.logDate
                     client.sadd(key,elem.mid)
                 }
+                //把数据保存到es里面
+                MyEsUtil.insertEsBulk(GmallConstant.ES_INDEX_DAU,startupLogList)
                 //关闭redis连接
                 client.close()
-                MyEsUtil.insertEsBulk(GmallConstant.ES_INDEX_DAU,startupLogList)
             })
         })
 

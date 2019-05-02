@@ -2,17 +2,13 @@ package com.atguigu.gmall1111.common.util
 
 import java.util
 import java.util.Objects
-
-import com.alibaba.fastjson.JSON
 import com.atguigu.gmall.dw.realtime.util.Movie
 import io.searchbox.client.config.HttpClientConfig
 import io.searchbox.client.{JestClient, JestClientFactory}
 import io.searchbox.core.{Bulk, BulkResult, Index}
 
-import scala.collection.immutable.HashMap
-
 object MyEsUtil {
-    private val ES_HOST = "http://hadoop102"
+    private val ES_HOST = "http://192.168.1.102"
     private val ES_HTTP_PORT = 9200
     private var factory:JestClientFactory = null
 
@@ -46,7 +42,6 @@ object MyEsUtil {
         factory.setHttpClientConfig(new HttpClientConfig.Builder(ES_HOST + ":" + ES_HTTP_PORT).multiThreaded(true)
           .maxTotalConnection(20) //连接总数
           .connTimeout(10000).readTimeout(10000).build)
-
     }
 
     def insertEsBulk(indexName:String,docs:List[Any]): Unit ={
