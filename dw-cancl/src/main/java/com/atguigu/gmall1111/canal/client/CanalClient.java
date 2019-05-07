@@ -6,7 +6,6 @@ import com.alibaba.otter.canal.protocol.CanalEntry;
 import com.alibaba.otter.canal.protocol.Message;
 import com.atguigu.gmall1111.canal.handler.CanalHandler;
 import com.google.protobuf.InvalidProtocolBufferException;
-
 import java.net.InetSocketAddress;
 import java.util.List;
 
