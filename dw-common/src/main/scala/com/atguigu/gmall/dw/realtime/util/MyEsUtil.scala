@@ -40,7 +40,7 @@ object MyEsUtil {
     private def build(): Unit = {
         factory = new JestClientFactory
         factory.setHttpClientConfig(new HttpClientConfig.Builder(ES_HOST + ":" + ES_HTTP_PORT).multiThreaded(true)
-          .maxTotalConnection(20) //连接总数
+          .maxTotalConnection(50) //连接总数
           .connTimeout(10000).readTimeout(10000).build)
     }
 
